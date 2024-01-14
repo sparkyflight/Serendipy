@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model applications {
+  id          Int       @id @default(autoincrement())
+  creatorid   String    @db.VarChar(255)
+  user        users?    @relation(fields: [creatorid], references: [userid])
+  name        String    @db.VarChar(255)
+  logo        String    @db.VarChar(255)
+  token       String    @unique @db.VarChar(255)
+  active      Boolean?  @default(true)
+  permissions Json?     @default("[\"global.*\"]") @db.Json
+  createdat   DateTime? @default(now())
+}
+
+model comments {
+  id        Int     @id @default(autoincrement())
+  creatorid String? @db.VarChar(255)
+  user      users?  @relation(fields: [creatorid], references: [userid])
+  caption   String? @db.VarChar(255)
+  image     String? @db.VarChar(255)
+  plugins   Json?   @db.Json
+  post      posts?  @relation(fields: [postId], references: [id])
+  postId    Int?
+}
+
+model posts {
+  id        Int        @id @default(autoincrement())
+  userid    String?    @db.VarChar(255)
+  user      users?     @relation(fields: [userid], references: [userid])
+  caption   String?    @db.VarChar(255)
+  image     String?    @db.VarChar(255)
+  plugins   Json?      @db.Json
+  type      Int
+  createdat DateTime?  @default(now())
+  postid    String?    @unique @db.VarChar(255)
+  upvotes   Json?      @db.Json
+  downvotes Json?      @db.Json
+  comments  comments[]
+}
+
+model users {
+  id           Int            @id @default(autoincrement())
+  name         String?        @db.VarChar(255)
+  userid       String?        @unique @db.VarChar(255)
+  usertag      String?        @db.VarChar(255)
+  bio          String?        @db.VarChar(255)
+  avatar       String?        @db.VarChar(255)
+  createdat    DateTime?      @default(now())
+  followers    Json?          @db.Json
+  following    Json?          @db.Json
+  badges       Json?          @db.Json
+  coins        Int?
+  posts        posts[]
+  applications applications[]
+  comments     comments[]
+}
