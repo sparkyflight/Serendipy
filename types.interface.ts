@@ -10,7 +10,7 @@ interface Post {
 	postid: string;
 	upvotes: string[];
 	downvotes: string[];
-    type: number;
+	type: number;
 	comments: {
 		user: User;
 		comment: {
