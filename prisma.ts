@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import type { User, Application, Post } from "./types.interface.js";
 import crypto from "crypto";
 
 const prisma = new PrismaClient();
@@ -12,7 +11,7 @@ class Users {
 		usertag: string,
 		bio: string,
 		avatar: string
-	): Promise<boolean | Error> {
+	) {
 		try {
 			await prisma.users.create({
 				data: {
@@ -35,7 +34,7 @@ class Users {
 		}
 	}
 
-	static async get(data: any): Promise<User | null> {
+	static async get(data: any) {
 		const doc = await prisma.users.findUnique({
 			where: data,
 		});
@@ -44,7 +43,7 @@ class Users {
 		else return doc;
 	}
 
-	static async find(data: any): Promise<User[]> {
+	static async find(data: any) {
 		const docs = await prisma.users.findMany({
 			where: data,
 		});
@@ -52,17 +51,14 @@ class Users {
 		return docs;
 	}
 
-	static async updateUser(
-		id: string,
-		data: object
-	): Promise<boolean | Error> {
+	static async updateUser(id: string, data: object) {
 		try {
 			await prisma.users.update({
-                where: {
-                    userid: id
-                },
-                data: data
-            });
+				where: {
+					userid: id,
+				},
+				data: data,
+			});
 
 			return true;
 		} catch (err) {
@@ -70,9 +66,9 @@ class Users {
 		}
 	}
 
-	static async delete(data: any): Promise<boolean | Error> {
+	static async delete(data: any) {
 		try {
-			await prisma.users.destroy({
+			await prisma.users.delete({
 				where: data,
 			});
 
@@ -82,10 +78,7 @@ class Users {
 		}
 	}
 
-	static async follow(
-		UserID: string,
-		Target: string
-	): Promise<boolean | Error> {
+	static async follow(UserID: string, Target: string) {
 		try {
 			const user = await prisma.users.findUnique({
 				where: {
@@ -105,27 +98,23 @@ class Users {
 			let followers = target.followers;
 			followers.push(UserID);
 
-			await prisma.users.update(
-				{
-					followers: followers,
+			await prisma.users.update({
+				where: {
+					userid: UserID,
 				},
-				{
-					where: {
-						userid: Target,
-					},
-				}
-			);
-
-			await prisma.users.update(
-				{
+				data: {
 					following: following,
 				},
-				{
-					where: {
-						userid: UserID,
-					},
-				}
-			);
+			});
+
+			await prisma.users.update({
+				where: {
+					userid: Target,
+				},
+				data: {
+					followers: followers,
+				},
+			});
 
 			return true;
 		} catch (err) {
@@ -133,10 +122,7 @@ class Users {
 		}
 	}
 
-	static async unfollow(
-		UserID: string,
-		Target: string
-	): Promise<boolean | Error> {
+	static async unfollow(UserID: string, Target: string) {
 		try {
 			const user = await prisma.users.findUnique({
 				where: {
@@ -156,27 +142,23 @@ class Users {
 			let followers = target.followers;
 			followers = followers.filter((p) => p !== UserID);
 
-			await prisma.users.update(
-				{
-					followers: followers,
+			await prisma.users.update({
+				where: {
+					userid: UserID,
 				},
-				{
-					where: {
-						userid: Target,
-					},
-				}
-			);
-
-			await prisma.users.update(
-				{
+				data: {
 					following: following,
 				},
-				{
-					where: {
-						userid: UserID,
-					},
-				}
-			);
+			});
+
+			await prisma.users.update({
+				where: {
+					userid: Target,
+				},
+				data: {
+					followers: followers,
+				},
+			});
 
 			return true;
 		} catch (err) {
@@ -190,21 +172,22 @@ class Posts {
 	static async createPost(
 		userid: string,
 		caption: string,
+        type: number,
 		image: string,
-		plugins: Post["plugins"]
-	): Promise<boolean | Error> {
+		plugins: any
+	) {
 		try {
 			await prisma.posts.create({
 				data: {
 					userid: userid,
 					caption: caption,
+                    type: type,
 					image: image,
 					plugins: plugins,
 					createdat: new Date(),
 					postid: crypto.randomUUID(),
 					upvotes: [],
 					downvotes: [],
-					comments: [],
 				},
 			});
 
@@ -214,7 +197,7 @@ class Posts {
 		}
 	}
 
-	static async get(PostID: string): Promise<any | Error> {
+	static async get(PostID: string) {
 		let post = await prisma.posts.findUnique({
 			where: {
 				postid: PostID,
@@ -252,7 +235,7 @@ class Posts {
 		}
 	}
 
-	static async find(data: object): Promise<object[]> {
+	static async find(data: object) {
 		let posts: object[] = [];
 
 		const docs = await prisma.posts.findMany({
@@ -289,7 +272,7 @@ class Posts {
 		return posts;
 	}
 
-	static async listAllPosts(): Promise<object[]> {
+	static async listAllPosts() {
 		let posts: object[] = [];
 
 		const docs = await prisma.posts.findMany();
@@ -322,7 +305,7 @@ class Posts {
 		return posts;
 	}
 
-	static async updatePost(id: string, data: any): Promise<boolean | Error> {
+	static async updatePost(id: string, data: any) {
 		try {
 			await prisma.posts.update(data, {
 				where: {
@@ -336,7 +319,7 @@ class Posts {
 		}
 	}
 
-	static async getAllUserPosts(UserID: string): Promise<Post[]> {
+	static async getAllUserPosts(UserID: string) {
 		let posts: Post[] = [];
 
 		const docs = await prisma.posts.findMany({
@@ -368,9 +351,9 @@ class Posts {
 		return posts;
 	}
 
-	static async delete(PostID: string): Promise<boolean | Error> {
+	static async delete(PostID: string) {
 		try {
-			await prisma.posts.destroy({
+			await prisma.posts.delete({
 				where: {
 					postid: PostID,
 				},
@@ -382,15 +365,12 @@ class Posts {
 		}
 	}
 
-	static async upvote(
-		PostID: string,
-		UserID: string
-	): Promise<boolean | Error> {
+	static async upvote(PostID: string, UserID: string) {
 		try {
 			let post = await Posts.get(PostID);
 			post.post.upvotes.push(UserID);
 
-			const result = await prisma.posts.updatePost(PostID, {
+			const result = await Posts.updatePost(PostID, {
 				upvotes: post.post.upvotes,
 			});
 			return result;
@@ -399,15 +379,12 @@ class Posts {
 		}
 	}
 
-	static async downvote(
-		PostID: string,
-		UserID: string
-	): Promise<boolean | Error> {
+	static async downvote(PostID: string, UserID: string) {
 		try {
 			let post = await Posts.get(PostID);
 			post.post.downvotes.push(UserID);
 
-			const result = await prisma.posts.updatePost(PostID, {
+			const result = await Posts.updatePost(PostID, {
 				downvotes: post.post.downvotes,
 			});
 			return result;
@@ -421,7 +398,7 @@ class Posts {
 		User: User,
 		Caption: string,
 		Image: string
-	): Promise<boolean | Error> {
+	) {
 		try {
 			let post = await Posts.get(PostID);
 
@@ -434,7 +411,7 @@ class Posts {
 					},
 				});
 
-				const result = await prisma.posts.updatePost(PostID, {
+				const result = await Posts.updatePost(PostID, {
 					comments: post.post.comments,
 				});
 				return result;
@@ -447,11 +424,7 @@ class Posts {
 
 // Developer Applications
 class Applications {
-	static async createApp(
-		creator_id: string,
-		name: string,
-		logo: string
-	): Promise<string | Error> {
+	static async createApp(creator_id: string, name: string, logo: string) {
 		try {
 			const token: string = crypto
 				.createHash("sha256")
@@ -481,9 +454,10 @@ class Applications {
 		}
 	}
 
-	static async updateApp(token: string, data: any): Promise<boolean | Error> {
+	static async updateApp(token: string, data: any) {
 		try {
-			await prisma.applications.update(data, {
+			await prisma.applications.update({
+				data: data,
 				where: {
 					token: token,
 				},
@@ -495,7 +469,7 @@ class Applications {
 		}
 	}
 
-	static async get(token: string): Promise<Application | null> {
+	static async get(token: string) {
 		const tokenData = await prisma.applications.findUnique({
 			where: {
 				token: token,
@@ -506,11 +480,9 @@ class Applications {
 		else return null;
 	}
 
-	static async getAllApplications(
-		creatorid: string
-	): Promise<Application[] | Error> {
+	static async getAllApplications(creatorid: string) {
 		try {
-			const doc = await prisma.applications.findUnique({
+			const doc = await prisma.applications.findMany({
 				where: {
 					creatorid: creatorid,
 				},
@@ -522,9 +494,9 @@ class Applications {
 		}
 	}
 
-	static async delete(data: any): Promise<boolean | Error> {
+	static async delete(data: any) {
 		try {
-			await prisma.applications.destroy({
+			await prisma.applications.delete({
 				where: data,
 			});
 

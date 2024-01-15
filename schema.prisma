@@ -15,7 +15,7 @@ model applications {
   logo        String    @db.VarChar(255)
   token       String    @unique @db.VarChar(255)
   active      Boolean?  @default(true)
-  permissions Json?     @default("[\"global.*\"]") @db.Json
+  permissions String[]  @default(["global.*"])
   createdat   DateTime? @default(now())
 }
 
@@ -40,8 +40,8 @@ model posts {
   type      Int
   createdat DateTime?  @default(now())
   postid    String?    @unique @db.VarChar(255)
-  upvotes   Json?      @db.Json
-  downvotes Json?      @db.Json
+  upvotes   String[]
+  downvotes String[]
   comments  comments[]
 }
 
@@ -53,10 +53,10 @@ model users {
   bio          String?        @db.VarChar(255)
   avatar       String?        @db.VarChar(255)
   createdat    DateTime?      @default(now())
-  followers    Json?          @db.Json
-  following    Json?          @db.Json
-  badges       Json?          @db.Json
-  coins        Int?
+  followers    String[]
+  following    String[]
+  badges       String[]
+  coins        Int?           @default(200)
   posts        posts[]
   applications applications[]
   comments     comments[]
