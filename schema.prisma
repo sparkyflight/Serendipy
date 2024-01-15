@@ -8,38 +8,55 @@ datasource db {
 }
 
 model applications {
-  id          Int       @id @default(autoincrement())
-  creatorid   String    @db.VarChar(255)
-  user        users?    @relation(fields: [creatorid], references: [userid])
-  name        String    @db.VarChar(255)
-  logo        String    @db.VarChar(255)
-  token       String    @unique @db.VarChar(255)
-  active      Boolean?  @default(true)
-  permissions String[]  @default(["global.*"])
-  createdat   DateTime? @default(now())
+  id          Int      @id @default(autoincrement())
+  creatorid   String   @db.VarChar(255)
+  user        users    @relation(fields: [creatorid], references: [userid])
+  name        String   @db.VarChar(255)
+  logo        String   @default("/logo.png") @db.VarChar(255)
+  token       String   @unique @db.VarChar(255)
+  active      Boolean  @default(true)
+  permissions String[] @default(["global.*"])
+  createdat   DateTime @default(now())
+}
+
+model plugins {
+  id     Int    @id @default(autoincrement())
+  postid String @db.VarChar(255)
+  post   posts  @relation(fields: [postid], references: [postid])
+  type   String @db.VarChar(255)
+  href   String @db.VarChar(255)
+}
+
+model commentPlugins {
+  id        Int      @id @default(autoincrement())
+  commentid String   @db.VarChar(255)
+  comment   comments @relation(fields: [commentid], references: [commentid])
+  type      String   @db.VarChar(255)
+  href      String   @db.VarChar(255)
 }
 
 model comments {
-  id        Int     @id @default(autoincrement())
-  creatorid String? @db.VarChar(255)
-  user      users?  @relation(fields: [creatorid], references: [userid])
-  caption   String? @db.VarChar(255)
-  image     String? @db.VarChar(255)
-  plugins   Json?   @db.Json
-  post      posts?  @relation(fields: [postId], references: [id])
-  postId    Int?
+  id        Int              @id @default(autoincrement())
+  creatorid String           @db.VarChar(255)
+  user      users            @relation(fields: [creatorid], references: [userid])
+  caption   String?          @db.VarChar(255)
+  image     String           @db.VarChar(255)
+  plugins   commentPlugins[]
+  post      posts            @relation(fields: [postid], references: [postid])
+  postid    String           @db.VarChar(255)
+  commentid String           @unique @db.VarChar(255)
 }
 
 model posts {
   id        Int        @id @default(autoincrement())
-  userid    String?    @db.VarChar(255)
-  user      users?     @relation(fields: [userid], references: [userid])
-  caption   String?    @db.VarChar(255)
+  userid    String     @db.VarChar(255)
+  user      users      @relation(fields: [userid], references: [userid])
+  caption   String     @db.VarChar(255)
   image     String?    @db.VarChar(255)
-  plugins   Json?      @db.Json
+  plugins   plugins[]
   type      Int
-  createdat DateTime?  @default(now())
-  postid    String?    @unique @db.VarChar(255)
+  createdat DateTime   @default(now())
+  postid    String     @unique @db.VarChar(255)
   upvotes   String[]
   downvotes String[]
   comments  comments[]
@@ -48,15 +65,15 @@ model posts {
 model users {
   id           Int            @id @default(autoincrement())
   name         String?        @db.VarChar(255)
-  userid       String?        @unique @db.VarChar(255)
-  usertag      String?        @db.VarChar(255)
-  bio          String?        @db.VarChar(255)
-  avatar       String?        @db.VarChar(255)
-  createdat    DateTime?      @default(now())
+  userid       String         @unique @db.VarChar(255)
+  usertag      String         @unique @db.VarChar(255)
+  bio          String         @default("None") @db.VarChar(255)
+  avatar       String         @default("/logo.png") @db.VarChar(255)
+  createdat    DateTime       @default(now())
   followers    String[]
   following    String[]
   badges       String[]
-  coins        Int?           @default(200)
+  coins        Int            @default(200)
   posts        posts[]
   applications applications[]
   comments     comments[]

@@ -37,6 +37,11 @@ class Users {
 	static async get(data: any) {
 		const doc = await prisma.users.findUnique({
 			where: data,
+			include: {
+				posts: true,
+				applications: true,
+				comments: true,
+			},
 		});
 
 		if (!doc) return null;
@@ -172,7 +177,7 @@ class Posts {
 	static async createPost(
 		userid: string,
 		caption: string,
-        type: number,
+		type: number,
 		image: string,
 		plugins: any
 	) {
@@ -181,7 +186,7 @@ class Posts {
 				data: {
 					userid: userid,
 					caption: caption,
-                    type: type,
+					type: type,
 					image: image,
 					plugins: plugins,
 					createdat: new Date(),
@@ -204,113 +209,32 @@ class Posts {
 			},
 		});
 
-		let Comments: Post["comments"] = [];
-
-		if (post) {
-			let user = await Users.get({ userid: post.userid });
-
-			if (user) {
-				for (const comment of post.comments) {
-					let user = await Users.get({
-						userid: comment.user.userid,
-					});
-
-					if (user) Comments.push(comment);
-					else continue;
-				}
-
-				post.comments = Comments;
-
-				let data = {
-					user: user,
-					post: post,
-				};
-
-				return data;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
-		}
+		if (post) return post;
+		else return null;
 	}
 
 	static async find(data: object) {
-		let posts: object[] = [];
-
 		const docs = await prisma.posts.findMany({
 			where: {
 				...data,
 			},
 		});
 
-		for (const post of docs) {
-			let Comments: Post["comments"] = [];
-
-			let user = await Users.get({ userid: post.userid });
-
-			for (const comment of post.comments) {
-				let user = await Users.get({
-					userid: comment.user.userid,
-				});
-
-				if (user) Comments.push(comment);
-				else continue;
-			}
-
-			if (!user) continue;
-			else {
-				post.comments = Comments;
-
-				posts.push({
-					post: post,
-					user: user,
-				});
-			}
-		}
-
-		return posts;
+		return docs;
 	}
 
 	static async listAllPosts() {
-		let posts: object[] = [];
-
 		const docs = await prisma.posts.findMany();
-
-		for (let post of docs) {
-			let Comments: Post["comments"] = [];
-
-			let user = await Users.get({ userid: post.userid });
-
-			for (const comment of post.comments) {
-				let user = await Users.get({
-					userid: comment.user.userid,
-				});
-
-				if (user) Comments.push(comment);
-				else continue;
-			}
-
-			if (!user) continue;
-			else {
-				post.comments = Comments;
-
-				posts.push({
-					post: post,
-					user: user,
-				});
-			}
-		}
-
-		return posts;
+		return docs;
 	}
 
 	static async updatePost(id: string, data: any) {
 		try {
-			await prisma.posts.update(data, {
+			await prisma.posts.update({
 				where: {
 					postid: id,
 				},
+				data: data,
 			});
 
 			return true;
@@ -320,35 +244,10 @@ class Posts {
 	}
 
 	static async getAllUserPosts(UserID: string) {
-		let posts: Post[] = [];
-
 		const docs = await prisma.posts.findMany({
 			where: { userid: UserID },
 		});
-
-		for (let post of docs) {
-			let Comments: Post["comments"] = [];
-
-			let user = await Users.get({ userid: post.userid });
-
-			for (const comment of post.comments) {
-				let user = await Users.get({
-					userid: comment.user.userid,
-				});
-
-				if (user) Comments.push(comment);
-				else continue;
-			}
-
-			if (!user) continue;
-			else {
-				post.comments = Comments;
-
-				posts.push(post);
-			}
-		}
-
-		return posts;
+		return docs;
 	}
 
 	static async delete(PostID: string) {
@@ -368,10 +267,10 @@ class Posts {
 	static async upvote(PostID: string, UserID: string) {
 		try {
 			let post = await Posts.get(PostID);
-			post.post.upvotes.push(UserID);
+			post.upvotes.push(UserID);
 
 			const result = await Posts.updatePost(PostID, {
-				upvotes: post.post.upvotes,
+				upvotes: post.upvotes,
 			});
 			return result;
 		} catch (err) {
@@ -382,10 +281,10 @@ class Posts {
 	static async downvote(PostID: string, UserID: string) {
 		try {
 			let post = await Posts.get(PostID);
-			post.post.downvotes.push(UserID);
+			post.downvotes.push(UserID);
 
 			const result = await Posts.updatePost(PostID, {
-				downvotes: post.post.downvotes,
+				downvotes: post.downvotes,
 			});
 			return result;
 		} catch (err) {
@@ -393,7 +292,7 @@ class Posts {
 		}
 	}
 
-	static async comment(
+	/*static async comment(
 		PostID: string,
 		User: User,
 		Caption: string,
@@ -403,7 +302,7 @@ class Posts {
 			let post = await Posts.get(PostID);
 
 			if (post) {
-				post.post.comments.push({
+				post.comments.push({
 					user: User,
 					comment: {
 						caption: Caption,
@@ -419,7 +318,7 @@ class Posts {
 		} catch (err) {
 			return err;
 		}
-	}
+	}*/
 }
 
 // Developer Applications
