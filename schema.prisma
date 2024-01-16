@@ -36,8 +36,8 @@ model commentPlugins {
 model comments {
   creatorid String           @db.VarChar(255)
   user      users            @relation(fields: [creatorid], references: [userid])
-  caption   String?          @db.VarChar(255)
-  image     String           @db.VarChar(255)
+  caption   String          @db.VarChar(255)
+  image     String?           @db.VarChar(255)
   plugins   commentPlugins[]
   post      posts            @relation(fields: [postid], references: [postid])
   postid    String           @db.VarChar(255)
