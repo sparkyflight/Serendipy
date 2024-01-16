@@ -49,7 +49,7 @@ class Users {
 	static async find(data: any) {
 		const docs = await prisma.users.findMany({
 			where: data,
-            include: {
+			include: {
 				posts: true,
 				applications: false,
 			},
@@ -206,11 +206,11 @@ class Posts {
 			where: {
 				postid: PostID,
 			},
-            include: {
-                user: true,
-                comments: true,
-                plugins: true
-            }
+			include: {
+				user: true,
+				comments: true,
+				plugins: true,
+			},
 		});
 
 		if (post) return post;
@@ -222,11 +222,11 @@ class Posts {
 			where: {
 				...data,
 			},
-            include: {
-                user: true,
-                comments: true,
-                plugins: true
-            }
+			include: {
+				user: true,
+				comments: true,
+				plugins: true,
+			},
 		});
 
 		return docs;
@@ -234,12 +234,12 @@ class Posts {
 
 	static async listAllPosts() {
 		const docs = await prisma.posts.findMany({
-            include: {
-                user: true,
-                comments: true,
-                plugins: true
-            }
-        });
+			include: {
+				user: true,
+				comments: true,
+				plugins: true,
+			},
+		});
 		return docs;
 	}
 
@@ -261,11 +261,11 @@ class Posts {
 	static async getAllUserPosts(UserID: string) {
 		const docs = await prisma.posts.findMany({
 			where: { userid: UserID },
-            include: {
-                user: true,
-                comments: true,
-                plugins: true
-            }
+			include: {
+				user: true,
+				comments: true,
+				plugins: true,
+			},
 		});
 		return docs;
 	}
@@ -392,9 +392,9 @@ class Applications {
 			where: {
 				token: token,
 			},
-            include: {
-                owner: true
-            }
+			include: {
+				owner: true,
+			},
 		});
 
 		if (tokenData) return tokenData;
@@ -407,9 +407,9 @@ class Applications {
 				where: {
 					creatorid: creatorid,
 				},
-                include: {
-                    owner: true
-                }
+				include: {
+					owner: true,
+				},
 			});
 
 			return doc;
