@@ -20,7 +20,6 @@ class Users {
 					usertag: usertag,
 					bio: bio,
 					avatar: avatar,
-					createdat: new Date(),
 					followers: [],
 					following: [],
 					badges: [],
@@ -39,8 +38,7 @@ class Users {
 			where: data,
 			include: {
 				posts: true,
-				applications: true,
-				comments: true,
+				applications: false,
 			},
 		});
 
@@ -51,6 +49,10 @@ class Users {
 	static async find(data: any) {
 		const docs = await prisma.users.findMany({
 			where: data,
+            include: {
+				posts: true,
+				applications: false,
+			},
 		});
 
 		return docs;
@@ -178,8 +180,7 @@ class Posts {
 		userid: string,
 		caption: string,
 		type: number,
-		image: string,
-		plugins: any
+		image: string
 	) {
 		try {
 			await prisma.posts.create({
@@ -188,8 +189,6 @@ class Posts {
 					caption: caption,
 					type: type,
 					image: image,
-					plugins: plugins,
-					createdat: new Date(),
 					postid: crypto.randomUUID(),
 					upvotes: [],
 					downvotes: [],
@@ -207,6 +206,10 @@ class Posts {
 			where: {
 				postid: PostID,
 			},
+            include: {
+                user: true,
+                comments: true
+            }
 		});
 
 		if (post) return post;
@@ -218,13 +221,22 @@ class Posts {
 			where: {
 				...data,
 			},
+            include: {
+                user: true,
+                comments: true
+            }
 		});
 
 		return docs;
 	}
 
 	static async listAllPosts() {
-		const docs = await prisma.posts.findMany();
+		const docs = await prisma.posts.findMany({
+            include: {
+                user: true,
+                comments: true
+            }
+        });
 		return docs;
 	}
 
@@ -246,6 +258,10 @@ class Posts {
 	static async getAllUserPosts(UserID: string) {
 		const docs = await prisma.posts.findMany({
 			where: { userid: UserID },
+            include: {
+                user: true,
+                comments: true
+            }
 		});
 		return docs;
 	}
@@ -343,7 +359,6 @@ class Applications {
 					token: token,
 					active: true,
 					permissions: ["global.*"],
-					createdat: new Date(),
 				},
 			});
 
@@ -373,6 +388,9 @@ class Applications {
 			where: {
 				token: token,
 			},
+            include: {
+                owner: true
+            }
 		});
 
 		if (tokenData) return tokenData;
@@ -385,6 +403,9 @@ class Applications {
 				where: {
 					creatorid: creatorid,
 				},
+                include: {
+                    owner: true
+                }
 			});
 
 			return doc;
