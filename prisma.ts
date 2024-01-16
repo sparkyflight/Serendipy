@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, commentPlugins } from "@prisma/client";
 import crypto from "crypto";
 
 const prisma = new PrismaClient();
@@ -208,7 +208,12 @@ class Posts {
 			},
 			include: {
 				user: true,
-				comments: true,
+				comments: {
+                    include: {
+                        user: true,
+                        plugins: true
+                    }
+                },
 				plugins: true,
 			},
 		});
@@ -312,33 +317,27 @@ class Posts {
 		}
 	}
 
-	/*static async comment(
+	static async comment(
 		PostID: string,
-		User: User,
+		UserID: string,
 		Caption: string,
-		Image: string
+		Image: string,
+        Plugins: Array<commentPlugins>
 	) {
 		try {
-			let post = await Posts.get(PostID);
-
-			if (post) {
-				post.comments.push({
-					user: User,
-					comment: {
-						caption: Caption,
-						image: Image,
-					},
-				});
-
-				const result = await Posts.updatePost(PostID, {
-					comments: post.post.comments,
-				});
-				return result;
-			} else return false;
+			await prisma.comments.create({
+                data: {
+                    postid: PostID,
+                    commentid: crypto.randomUUID().toString(),
+                    creatorid: UserID,
+                    caption: Caption,
+                    image: Image,
+                },
+            });
 		} catch (err) {
 			return err;
 		}
-	}*/
+	}
 }
 
 // Developer Applications
