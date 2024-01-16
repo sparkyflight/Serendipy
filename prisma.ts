@@ -432,5 +432,4 @@ class Applications {
 }
 
 // Export the classes
-export default prisma;
-export { Users, Posts, Applications };
+export { prisma, Users, Posts, Applications };
