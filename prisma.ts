@@ -208,7 +208,8 @@ class Posts {
 			},
             include: {
                 user: true,
-                comments: true
+                comments: true,
+                plugins: true
             }
 		});
 
@@ -223,7 +224,8 @@ class Posts {
 			},
             include: {
                 user: true,
-                comments: true
+                comments: true,
+                plugins: true
             }
 		});
 
@@ -234,7 +236,8 @@ class Posts {
 		const docs = await prisma.posts.findMany({
             include: {
                 user: true,
-                comments: true
+                comments: true,
+                plugins: true
             }
         });
 		return docs;
@@ -260,7 +263,8 @@ class Posts {
 			where: { userid: UserID },
             include: {
                 user: true,
-                comments: true
+                comments: true,
+                plugins: true
             }
 		});
 		return docs;
