@@ -22,8 +22,7 @@ class Users {
 					avatar: avatar,
 					followers: [],
 					following: [],
-					badges: [],
-					coins: 200,
+					badges: []
 				},
 			});
 
