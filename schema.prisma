@@ -25,23 +25,14 @@ model plugins {
   href   String @db.VarChar(255)
 }
 
-model commentPlugins {
-  id        Int      @id @default(autoincrement())
-  commentid String   @db.VarChar(255)
-  comment   comments @relation(fields: [commentid], references: [commentid])
-  type      String   @db.VarChar(255)
-  href      String   @db.VarChar(255)
-}
-
 model comments {
-  creatorid String           @db.VarChar(255)
-  user      users            @relation(fields: [creatorid], references: [userid])
-  caption   String          @db.VarChar(255)
-  image     String?           @db.VarChar(255)
-  plugins   commentPlugins[]
-  post      posts            @relation(fields: [postid], references: [postid])
-  postid    String           @db.VarChar(255)
-  commentid String           @id @unique @db.VarChar(255)
+  creatorid String  @db.VarChar(255)
+  user      users   @relation(fields: [creatorid], references: [userid])
+  caption   String  @db.VarChar(255)
+  image     String? @db.VarChar(255)
+  post      posts   @relation(fields: [postid], references: [postid])
+  postid    String  @db.VarChar(255)
+  commentid String  @id @unique @db.VarChar(255)
 }
 
 model posts {

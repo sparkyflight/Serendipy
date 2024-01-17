@@ -1,4 +1,4 @@
-import { PrismaClient, commentPlugins } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 
 const prisma = new PrismaClient();
@@ -210,8 +210,7 @@ class Posts {
 				user: true,
 				comments: {
                     include: {
-                        user: true,
-                        plugins: true
+                        user: true
                     }
                 },
 				plugins: true,
@@ -321,8 +320,7 @@ class Posts {
 		PostID: string,
 		UserID: string,
 		Caption: string,
-		Image: string,
-        Plugins: Array<commentPlugins>
+		Image: string
 	) {
 		try {
 			await prisma.comments.create({
@@ -334,6 +332,8 @@ class Posts {
                     image: Image,
                 },
             });
+
+            return true;
 		} catch (err) {
 			return err;
 		}
