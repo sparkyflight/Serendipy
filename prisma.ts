@@ -180,19 +180,32 @@ class Posts {
 		userid: string,
 		caption: string,
 		type: number,
-		image: string
+		image: string,
+		plugins: any[]
 	) {
 		try {
+			const postid = crypto.randomUUID();
+
 			await prisma.posts.create({
 				data: {
 					userid: userid,
 					caption: caption,
 					type: type,
 					image: image,
-					postid: crypto.randomUUID(),
+					postid: postid,
 					upvotes: [],
 					downvotes: [],
 				},
+			});
+
+			plugins.map(async (p) => {
+				await prisma.plugins.create({
+					data: {
+						postid: postid,
+						type: p.type,
+						href: p.href,
+					},
+				});
 			});
 
 			return true;
@@ -209,10 +222,10 @@ class Posts {
 			include: {
 				user: true,
 				comments: {
-                    include: {
-                        user: true
-                    }
-                },
+					include: {
+						user: true,
+					},
+				},
 				plugins: true,
 			},
 		});
@@ -324,16 +337,16 @@ class Posts {
 	) {
 		try {
 			await prisma.comments.create({
-                data: {
-                    postid: PostID,
-                    commentid: crypto.randomUUID().toString(),
-                    creatorid: UserID,
-                    caption: Caption,
-                    image: Image,
-                },
-            });
+				data: {
+					postid: PostID,
+					commentid: crypto.randomUUID().toString(),
+					creatorid: UserID,
+					caption: Caption,
+					image: Image,
+				},
+			});
 
-            return true;
+			return true;
 		} catch (err) {
 			return err;
 		}
