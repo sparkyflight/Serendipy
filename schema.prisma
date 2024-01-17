@@ -48,16 +48,28 @@ model posts {
   comments  comments[]
 }
 
+model connections {
+  id     String @id @unique @db.VarChar(255)
+  userid String @db.VarChar(255)
+  user   users  @relation(fields: [userid], references: [userid])
+
+  service        String  @db.VarChar(255)
+  serviceid      String  @db.VarChar(255)
+  servicetoken   String? @db.VarChar(255)
+  servicerefresh String? @db.VarChar(255)
+}
+
 model users {
   name         String?        @db.VarChar(255)
   userid       String         @id @unique @db.VarChar(255)
   usertag      String         @unique @db.VarChar(255)
-  bio          String         @default("None") @db.VarChar(255)
+  bio          String         @default("i exist now. yes.") @db.VarChar(255)
   avatar       String         @default("/logo.png") @db.VarChar(255)
   followers    String[]
   following    String[]
   badges       String[]
-  coins        Int            @default(200)
+  staff_perms  String[]       @default([])
+  connections  connections[]
   posts        posts[]
   applications applications[]
   comments     comments[]
