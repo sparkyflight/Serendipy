@@ -2,6 +2,27 @@
 // DO NOT EDIT
 
 
+export enum botstatus {
+    ONLINE = 'ONLINE',
+    IDLE = 'IDLE',
+    DND = 'DND',
+    OFFLINE = 'OFFLINE',
+}
+
+export enum botstate {
+    APPROVED = 'APPROVED',
+    DENIED = 'DENIED',
+    PENDING = 'PENDING',
+    BANNED = 'BANNED',
+}
+
+export enum botaction {
+    APPROVE = 'APPROVE',
+    DENY = 'DENY',
+    BAN = 'BAN',
+    VOTE_BAN = 'VOTE_BAN',
+    OTHER = 'OTHER',
+}
 
 
 export interface applications {
@@ -45,6 +66,29 @@ export interface posts {
     comments: comments[],
 }
 
+export interface botaudits {
+    id: number,
+    botid: string,
+    bot: discordbots,
+    staffid: string,
+    action: botaction,
+    reason: string,
+}
+
+export interface discordbots {
+    botid: string,
+    name: string,
+    description: string,
+    longdescription: string,
+    status: botstatus,
+    state: botstate,
+    auditlogs: botaudits[],
+    upvotes: string[],
+    downvotes: string[],
+    ownerid: string,
+    owner: users,
+}
+
 export interface connections {
     id: string,
     userid: string,
@@ -65,6 +109,7 @@ export interface users {
     following: string[],
     badges: string[],
     staff_perms: string[],
+    discordbots: discordbots[],
     connections: connections[],
     posts: posts[],
     applications: applications[],
