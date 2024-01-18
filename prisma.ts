@@ -22,7 +22,7 @@ class Users {
 					avatar: avatar,
 					followers: [],
 					following: [],
-					badges: []
+					badges: [],
 				},
 			});
 
