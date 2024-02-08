@@ -23,7 +23,6 @@ class Users {
 					followers: [],
 					following: [],
 					badges: [],
-					coins: 200,
 				},
 			});
 

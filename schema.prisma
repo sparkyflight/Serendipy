@@ -8,57 +8,72 @@ datasource db {
 }
 
 model applications {
-  creatorid   String   @db.VarChar(255)
-  owner       users    @relation(fields: [creatorid], references: [userid])
-  name        String   @db.VarChar(255)
-  logo        String   @default("/logo.png") @db.VarChar(255)
-  token       String   @unique @db.VarChar(255)
-  active      Boolean  @default(true)
+  creatorid String @db.VarChar(255)
+  owner     users  @relation(fields: [creatorid], references: [userid])
+
+  name String @db.VarChar(255)
+  logo String @default("/logo.png") @db.VarChar(255)
+
+  token  String  @unique @db.VarChar(255)
+  active Boolean @default(true)
+
   permissions String[] @default(["global.*"])
 }
 
 model plugins {
   id     Int    @id @default(autoincrement())
   postid String @db.VarChar(255)
-  post   posts  @relation(fields: [postid], references: [postid])
-  type   String @db.VarChar(255)
-  href   String @db.VarChar(255)
+
+  post posts @relation(fields: [postid], references: [postid])
+
+  type String @db.VarChar(255)
+  href String @db.VarChar(255)
 }
 
 model comments {
-  creatorid String  @db.VarChar(255)
-  user      users   @relation(fields: [creatorid], references: [userid])
-  caption   String  @db.VarChar(255)
-  image     String? @db.VarChar(255)
-  post      posts   @relation(fields: [postid], references: [postid])
-  postid    String  @db.VarChar(255)
-  commentid String  @id @unique @db.VarChar(255)
+  creatorid String @db.VarChar(255)
+  user      users  @relation(fields: [creatorid], references: [userid])
+
+  caption String  @db.VarChar(255)
+  image   String? @db.VarChar(255)
+
+  post   posts  @relation(fields: [postid], references: [postid])
+  postid String @db.VarChar(255)
+
+  commentid String @id @unique @db.VarChar(255)
 }
 
 model posts {
-  userid    String     @db.VarChar(255)
-  user      users      @relation(fields: [userid], references: [userid])
-  caption   String     @db.VarChar(255)
-  image     String?    @db.VarChar(255)
-  plugins   plugins[]
-  type      Int
-  postid    String     @id @unique @db.VarChar(255)
+  userid String @db.VarChar(255)
+  user   users  @relation(fields: [userid], references: [userid])
+
+  caption String    @db.VarChar(255)
+  image   String?   @db.VarChar(255)
+  plugins plugins[]
+
+  type   Int
+  postid String @id @unique @db.VarChar(255)
+
   upvotes   String[]
   downvotes String[]
   comments  comments[]
 }
 
 model users {
-  name         String?        @db.VarChar(255)
-  userid       String         @id @unique @db.VarChar(255)
-  usertag      String         @unique @db.VarChar(255)
-  bio          String         @default("None") @db.VarChar(255)
-  avatar       String         @default("/logo.png") @db.VarChar(255)
-  followers    String[]
-  following    String[]
-  badges       String[]
-  coins        Int            @default(200)
-  posts        posts[]
+  name    String? @db.VarChar(255)
+  userid  String  @id @unique @db.VarChar(255)
+  usertag String  @unique @db.VarChar(255)
+
+  bio       String   @default("i exist now. yes.") @db.VarChar(255)
+  avatar    String   @default("/logo.png") @db.VarChar(255)
+  followers String[]
+  following String[]
+  badges    String[]
+
+  staff_perms String[] @default([])
+
   applications applications[]
-  comments     comments[]
+
+  posts    posts[]
+  comments comments[]
 }

@@ -51,8 +51,8 @@ export interface users {
 	followers: string[];
 	following: string[];
 	badges: string[];
-	coins: number;
-	posts: posts[];
+	staff_perms: string[];
 	applications: applications[];
+	posts: posts[];
 	comments: comments[];
 }
