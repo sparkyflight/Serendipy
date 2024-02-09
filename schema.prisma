@@ -7,6 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model partnerLinks {
+    id String @id @unique @default(uuid())
+    partnerName String
+    partner partners @relation(fields: [partnerName], references: [name])
+
+    name String
+    emoji String
+    link String
+}
+
+model partners {
+    id String @id @unique @default(uuid())
+
+    name String @unique
+    logo String @unique
+    category String
+
+    owner String
+    ownerImage String
+    ownerLink String?
+
+    description String
+    long_description String
+    links partnerLinks[]
+}
+
 model applications {
   creatorid String @db.VarChar(255)
   owner     users  @relation(fields: [creatorid], references: [userid])
@@ -73,7 +99,6 @@ model users {
   staff_perms String[] @default([])
 
   applications applications[]
-
   posts    posts[]
   comments comments[]
 }

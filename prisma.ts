@@ -442,5 +442,34 @@ class Applications {
 	}
 }
 
+// Partners
+class Partners {
+    static async get(data: any) {
+		const partner = await prisma.partners.findUnique({
+			where: data,
+			include: {
+				links: true,
+			},
+		});
+
+		if (partner) return partner;
+		else return null;
+	}
+
+    static async getAllPartners() {
+		try {
+			const doc = await prisma.partners.findMany({
+				include: {
+					links: true,
+				},
+			});
+
+			return doc;
+		} catch (error) {
+			return error;
+		}
+	}
+}
+
 // Export the classes
-export { prisma, Users, Posts, Applications };
+export { prisma, Users, Posts, Applications, Partners };
