@@ -1,6 +1,28 @@
 // AUTO GENERATED FILE BY @kalissaac/prisma-typegen
 // DO NOT EDIT
 
+export interface partnerLinks {
+	id: string;
+	partnerName: string;
+	partner: partners;
+	name: string;
+	emoji: string;
+	link: string;
+}
+
+export interface partners {
+	id: string;
+	name: string;
+	logo: string;
+	category: string;
+	owner: string;
+	ownerImage: string;
+	ownerLink?: string;
+	description: string;
+	long_description: string;
+	links: partnerLinks[];
+}
+
 export interface applications {
 	creatorid: string;
 	owner: users;

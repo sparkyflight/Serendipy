@@ -444,7 +444,7 @@ class Applications {
 
 // Partners
 class Partners {
-    static async get(data: any) {
+	static async get(data: any) {
 		const partner = await prisma.partners.findUnique({
 			where: data,
 			include: {
@@ -456,7 +456,7 @@ class Partners {
 		else return null;
 	}
 
-    static async getAllPartners() {
+	static async getAllPartners() {
 		try {
 			const doc = await prisma.partners.findMany({
 				include: {
