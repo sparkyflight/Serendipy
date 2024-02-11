@@ -202,7 +202,8 @@ class Posts {
 					data: {
 						postid: postid,
 						type: p.type,
-						href: p.href,
+						href: p.href || null,
+                        jsonData: p.jsonData
 					},
 				});
 			});
