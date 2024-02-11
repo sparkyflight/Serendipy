@@ -53,7 +53,8 @@ model plugins {
   post posts @relation(fields: [postid], references: [postid])
 
   type String @db.VarChar(255)
-  href String @db.VarChar(255)
+  href String? @db.VarChar(255)
+  jsonData Json?
 }
 
 model comments {
