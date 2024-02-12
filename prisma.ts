@@ -38,6 +38,7 @@ class Users {
 			include: {
 				posts: true,
 				applications: false,
+				fcm_keys: false,
 			},
 		});
 
@@ -51,6 +52,7 @@ class Users {
 			include: {
 				posts: true,
 				applications: false,
+				fcm_keys: false,
 			},
 		});
 
@@ -203,7 +205,7 @@ class Posts {
 						postid: postid,
 						type: p.type,
 						href: p.href || null,
-                        jsonData: p.jsonData
+						jsonData: p.jsonData,
 					},
 				});
 			});
@@ -289,6 +291,18 @@ class Posts {
 
 	static async delete(PostID: string) {
 		try {
+			await prisma.comments.deleteMany({
+				where: {
+					postid: PostID,
+				},
+			});
+
+			await prisma.plugins.deleteMany({
+				where: {
+					postid: PostID,
+				},
+			});
+
 			await prisma.posts.delete({
 				where: {
 					postid: PostID,

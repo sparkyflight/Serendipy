@@ -8,29 +8,29 @@ datasource db {
 }
 
 model partnerLinks {
-    id String @id @unique @default(uuid())
-    partnerName String
-    partner partners @relation(fields: [partnerName], references: [name])
+  id          String   @id @unique @default(uuid())
+  partnerName String
+  partner     partners @relation(fields: [partnerName], references: [name])
 
-    name String
-    emoji String
-    link String
+  name  String
+  emoji String
+  link  String
 }
 
 model partners {
-    id String @id @unique @default(uuid())
+  id String @id @unique @default(uuid())
 
-    name String @unique
-    logo String @unique
-    category String
+  name     String @unique
+  logo     String @unique
+  category String
 
-    owner String
-    ownerImage String
-    ownerLink String?
+  owner      String
+  ownerImage String
+  ownerLink  String?
 
-    description String
-    long_description String
-    links partnerLinks[]
+  description      String
+  long_description String
+  links            partnerLinks[]
 }
 
 model applications {
@@ -52,9 +52,18 @@ model plugins {
 
   post posts @relation(fields: [postid], references: [postid])
 
-  type String @db.VarChar(255)
-  href String? @db.VarChar(255)
+  type     String  @db.VarChar(255)
+  href     String? @db.VarChar(255)
   jsonData Json?
+}
+
+model fcm_keys {
+  id     String @id @unique @default(uuid())
+  userid String @db.VarChar(255)
+  user   users  @relation(fields: [userid], references: [userid])
+
+  name String
+  key  String
 }
 
 model comments {
@@ -100,6 +109,7 @@ model users {
   staff_perms String[] @default([])
 
   applications applications[]
-  posts    posts[]
-  comments comments[]
+  posts        posts[]
+  comments     comments[]
+  fcm_keys     fcm_keys[]
 }
