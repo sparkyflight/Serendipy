@@ -74,10 +74,44 @@ class Users {
 		}
 	}
 
-	static async delete(data: any) {
+	static async delete(id: string) {
 		try {
+			await prisma.applications.deleteMany({
+				where: {
+					creatorid: id,
+				},
+			});
+
+			await prisma.comments.deleteMany({
+				where: {
+					creatorid: id,
+				},
+			});
+
+			(await prisma.posts.findMany({})).map(async (post) => {
+				await prisma.plugins.deleteMany({
+					where: {
+						postid: post.postid,
+					},
+				});
+			});
+
+			await prisma.posts.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
+			await prisma.fcm_keys.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
 			await prisma.users.delete({
-				where: data,
+				where: {
+					userid: id,
+				},
 			});
 
 			return true;
