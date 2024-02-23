@@ -1,6 +1,13 @@
 // AUTO GENERATED FILE BY @kalissaac/prisma-typegen
 // DO NOT EDIT
 
+export enum State {
+	BANNED = "BANNED",
+	PRIVATE = "PRIVATE",
+	VOTE_BANNED = "VOTE_BANNED",
+	FOLLOW_BANNED = "FOLLOW_BANNED",
+}
+
 export interface partnerLinks {
 	id: string;
 	partnerName: string;
@@ -60,6 +67,28 @@ export interface comments {
 	commentid: string;
 }
 
+export interface upvotes {
+	id: string;
+	userid: string;
+	postid: string;
+	post: posts;
+}
+
+export interface downvotes {
+	id: string;
+	userid: string;
+	postid: string;
+	post: posts;
+}
+
+export interface following {
+	id: string;
+	userid: string;
+	user: users;
+	targetid: string;
+	target: users;
+}
+
 export interface posts {
 	userid: string;
 	user: users;
@@ -68,8 +97,8 @@ export interface posts {
 	plugins: plugins[];
 	type: number;
 	postid: string;
-	upvotes: string[];
-	downvotes: string[];
+	upvotes: upvotes[];
+	downvotes: downvotes[];
 	comments: comments[];
 }
 
@@ -79,9 +108,10 @@ export interface users {
 	usertag: string;
 	bio: string;
 	avatar: string;
-	followers: string[];
-	following: string[];
+	followers: following[];
+	following: following[];
 	badges: string[];
+	state?: State;
 	staff_perms: string[];
 	applications: applications[];
 	posts: posts[];
