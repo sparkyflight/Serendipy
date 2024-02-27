@@ -32,7 +32,12 @@ class Users {
 
 	static async get(data: any) {
 		const doc = await prisma.users.findUnique({
-			where: data,
+			where: {
+				...data,
+				state: {
+					not: "BANNED",
+				},
+			},
 			include: {
 				posts: true,
 				applications: false,
@@ -58,7 +63,12 @@ class Users {
 
 	static async find(data: any) {
 		const docs = await prisma.users.findMany({
-			where: data,
+			where: {
+				...data,
+				state: {
+					not: "BANNED",
+				},
+			},
 			include: {
 				posts: true,
 				applications: false,
@@ -294,15 +304,14 @@ class Posts {
 			},
 		});
 
-		if (post) return post;
+		if (post.user.state === "BANNED") return null;
+		else if (post) return post;
 		else return null;
 	}
 
 	static async find(data: object) {
 		const docs = await prisma.posts.findMany({
-			where: {
-				...data,
-			},
+			where: data,
 			include: {
 				user: true,
 				comments: true,
@@ -320,7 +329,7 @@ class Posts {
 			},
 		});
 
-		return docs;
+		return docs.filter((p) => p.user.state != "BANNED");
 	}
 
 	static async listAllPosts() {
@@ -341,7 +350,8 @@ class Posts {
 				},
 			},
 		});
-		return docs;
+
+		return docs.filter((p) => p.user.state != "BANNED");
 	}
 
 	static async updatePost(id: string, data: any) {
@@ -378,7 +388,8 @@ class Posts {
 				},
 			},
 		});
-		return docs;
+
+		return docs.filter((p) => p.user.state != "BANNED");
 	}
 
 	static async delete(PostID: string) {

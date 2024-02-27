@@ -126,11 +126,11 @@ model users {
 
   bio       String   @default("None") @db.VarChar(255)
   avatar    String   @default("/logo.png") @db.VarChar(255)
-  followers following[] @relation("user")
-  following following[] @relation("target")
+  followers following[] @relation("target")
+  following following[] @relation("user")
   badges    String[]
 
-  state State?
+  state State @default(ACTIVE)
   staff_perms String[] @default([])
 
   applications applications[]
@@ -140,8 +140,9 @@ model users {
 }
 
 enum State {
+    ACTIVE
     BANNED
-    PRIVATE
     VOTE_BANNED
     FOLLOW_BANNED
+    PRIVATE
 }

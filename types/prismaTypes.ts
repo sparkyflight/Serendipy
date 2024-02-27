@@ -2,10 +2,11 @@
 // DO NOT EDIT
 
 export enum State {
+	ACTIVE = "ACTIVE",
 	BANNED = "BANNED",
-	PRIVATE = "PRIVATE",
 	VOTE_BANNED = "VOTE_BANNED",
 	FOLLOW_BANNED = "FOLLOW_BANNED",
+	PRIVATE = "PRIVATE",
 }
 
 export interface partnerLinks {
@@ -111,7 +112,7 @@ export interface users {
 	followers: following[];
 	following: following[];
 	badges: string[];
-	state?: State;
+	state: State;
 	staff_perms: string[];
 	applications: applications[];
 	posts: posts[];
