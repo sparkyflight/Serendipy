@@ -61,9 +61,9 @@ const entities: {
 		execute: (data: any) => Promise<boolean | RPCError>;
 	}[];
 }[] = [];
-const entityFiles = getFilesInDirectory(
-	"./dist/v2-database/rpc_entities"
-).filter((file) => file.endsWith(".js"));
+const entityFiles = getFilesInDirectory("./dist/Serendipy/rpc_entities").filter(
+	(file) => file.endsWith(".js")
+);
 
 for (const file of entityFiles) {
 	import(`../${file}`)
