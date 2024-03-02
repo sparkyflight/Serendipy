@@ -1,5 +1,5 @@
 // Packages
-import { hasPerm } from "../perms.js";
+import { hasPerm } from "./perms.js";
 import { EmbedBuilder, WebhookClient } from "discord.js";
 import * as database from "./prisma.js";
 import * as fs from "node:fs";
