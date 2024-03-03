@@ -122,6 +122,7 @@ model posts {
 model users {
   name    String? @db.VarChar(255)
   userid  String  @id @unique @db.VarChar(255)
+  discord_id String? @db.VarChar(255)
   usertag String  @unique @db.VarChar(255)
 
   bio       String   @default("None") @db.VarChar(255)
