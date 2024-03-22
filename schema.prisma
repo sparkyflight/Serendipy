@@ -117,6 +117,8 @@ model posts {
   upvotes   upvotes[]
   downvotes downvotes[]
   comments  comments[]
+
+  createdat DateTime @default(now())
 }
 
 model users {

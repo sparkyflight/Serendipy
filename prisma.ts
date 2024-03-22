@@ -349,6 +349,9 @@ class Posts {
 					},
 				},
 			},
+			orderBy: {
+				createdat: "desc",
+			},
 		});
 
 		return docs.filter((p) => p.user.state != "BANNED");
