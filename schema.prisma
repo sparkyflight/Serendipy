@@ -79,6 +79,30 @@ model comments {
   commentid String @id @unique @db.VarChar(255)
 }
 
+model upvotes {
+    id  String  @id @unique @default(uuid())
+    userid String @db.VarChar(255)
+    postid String @db.VarChar(255)
+    post posts @relation(fields: [postid], references: [postid])
+}
+
+model downvotes {
+    id  String  @id @unique @default(uuid())
+    userid String @db.VarChar(255)
+    postid String @db.VarChar(255)
+    post posts @relation(fields: [postid], references: [postid])
+}
+
+model following {
+    id  String  @id @unique @default(uuid())
+    
+    userid String @db.VarChar(255)
+    user users @relation("user", fields: [userid], references: [userid])
+
+    targetid String @db.VarChar(255)
+    target users @relation("target", fields: [targetid], references: [userid])
+}
+
 model posts {
   userid String @db.VarChar(255)
   user   users  @relation(fields: [userid], references: [userid])
@@ -90,26 +114,38 @@ model posts {
   type   Int
   postid String @id @unique @db.VarChar(255)
 
-  upvotes   String[]
-  downvotes String[]
+  upvotes   upvotes[]
+  downvotes downvotes[]
   comments  comments[]
+
+  createdat DateTime @default(now())
 }
 
 model users {
   name    String? @db.VarChar(255)
   userid  String  @id @unique @db.VarChar(255)
+  discord_id String? @db.VarChar(255) @unique
   usertag String  @unique @db.VarChar(255)
 
-  bio       String   @default("i exist now. yes.") @db.VarChar(255)
+  bio       String   @default("None") @db.VarChar(255)
   avatar    String   @default("/logo.png") @db.VarChar(255)
-  followers String[]
-  following String[]
+  followers following[] @relation("target")
+  following following[] @relation("user")
   badges    String[]
 
+  state State @default(ACTIVE)
   staff_perms String[] @default([])
 
   applications applications[]
   posts        posts[]
   comments     comments[]
   fcm_keys     fcm_keys[]
+}
+
+enum State {
+    ACTIVE
+    BANNED
+    VOTE_BANNED
+    FOLLOW_BANNED
+    PRIVATE
 }

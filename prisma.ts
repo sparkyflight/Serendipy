@@ -20,8 +20,6 @@ class Users {
 					usertag: usertag,
 					bio: bio,
 					avatar: avatar,
-					followers: [],
-					following: [],
 					badges: [],
 				},
 			});
@@ -34,11 +32,28 @@ class Users {
 
 	static async get(data: any) {
 		const doc = await prisma.users.findUnique({
-			where: data,
+			where: {
+				...data,
+				state: {
+					not: "BANNED",
+				},
+			},
 			include: {
 				posts: true,
 				applications: false,
 				fcm_keys: false,
+				followers: {
+					include: {
+						user: false,
+						target: false,
+					},
+				},
+				following: {
+					include: {
+						user: false,
+						target: false,
+					},
+				},
 			},
 		});
 
@@ -48,11 +63,28 @@ class Users {
 
 	static async find(data: any) {
 		const docs = await prisma.users.findMany({
-			where: data,
+			where: {
+				...data,
+				state: {
+					not: "BANNED",
+				},
+			},
 			include: {
 				posts: true,
 				applications: false,
 				fcm_keys: false,
+				followers: {
+					include: {
+						user: false,
+						target: false,
+					},
+				},
+				following: {
+					include: {
+						user: false,
+						target: false,
+					},
+				},
 			},
 		});
 
@@ -74,10 +106,68 @@ class Users {
 		}
 	}
 
-	static async delete(data: any) {
+	static async delete(id: string) {
 		try {
+			await prisma.applications.deleteMany({
+				where: {
+					creatorid: id,
+				},
+			});
+
+			await prisma.comments.deleteMany({
+				where: {
+					creatorid: id,
+				},
+			});
+
+			await prisma.upvotes.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
+			await prisma.downvotes.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
+			(await prisma.posts.findMany({})).map(async (post) => {
+				await prisma.plugins.deleteMany({
+					where: {
+						postid: post.postid,
+					},
+				});
+			});
+
+			await prisma.posts.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
+			await prisma.fcm_keys.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
+			await prisma.following.deleteMany({
+				where: {
+					userid: id,
+				},
+			});
+
+			await prisma.following.deleteMany({
+				where: {
+					targetid: id,
+				},
+			});
+
 			await prisma.users.delete({
-				where: data,
+				where: {
+					userid: id,
+				},
 			});
 
 			return true;
@@ -100,31 +190,18 @@ class Users {
 				},
 			});
 
-			let following = user.following;
-			following.push(Target);
+			if (!user || !target) return false;
+			else if (user.userid === target.userid) return false;
+			else {
+				await prisma.following.create({
+					data: {
+						userid: UserID,
+						targetid: Target,
+					},
+				});
 
-			let followers = target.followers;
-			followers.push(UserID);
-
-			await prisma.users.update({
-				where: {
-					userid: UserID,
-				},
-				data: {
-					following: following,
-				},
-			});
-
-			await prisma.users.update({
-				where: {
-					userid: Target,
-				},
-				data: {
-					followers: followers,
-				},
-			});
-
-			return true;
+				return true;
+			}
 		} catch (err) {
 			return err;
 		}
@@ -144,31 +221,18 @@ class Users {
 				},
 			});
 
-			let following = user.following;
-			following = following.filter((p) => p !== Target);
+			if (!user || !target) return false;
+			else if (user.userid === target.userid) return false;
+			else {
+				await prisma.following.deleteMany({
+					where: {
+						userid: UserID,
+						targetid: Target,
+					},
+				});
 
-			let followers = target.followers;
-			followers = followers.filter((p) => p !== UserID);
-
-			await prisma.users.update({
-				where: {
-					userid: UserID,
-				},
-				data: {
-					following: following,
-				},
-			});
-
-			await prisma.users.update({
-				where: {
-					userid: Target,
-				},
-				data: {
-					followers: followers,
-				},
-			});
-
-			return true;
+				return true;
+			}
 		} catch (err) {
 			return err;
 		}
@@ -194,8 +258,6 @@ class Posts {
 					type: type,
 					image: image,
 					postid: postid,
-					upvotes: [],
-					downvotes: [],
 				},
 			});
 
@@ -229,26 +291,45 @@ class Posts {
 					},
 				},
 				plugins: true,
+				upvotes: {
+					include: {
+						post: false,
+					},
+				},
+				downvotes: {
+					include: {
+						post: false,
+					},
+				},
 			},
 		});
 
-		if (post) return post;
+		if (post.user.state === "BANNED") return null;
+		else if (post) return post;
 		else return null;
 	}
 
 	static async find(data: object) {
 		const docs = await prisma.posts.findMany({
-			where: {
-				...data,
-			},
+			where: data,
 			include: {
 				user: true,
 				comments: true,
 				plugins: true,
+				upvotes: {
+					include: {
+						post: false,
+					},
+				},
+				downvotes: {
+					include: {
+						post: false,
+					},
+				},
 			},
 		});
 
-		return docs;
+		return docs.filter((p) => p.user.state != "BANNED");
 	}
 
 	static async listAllPosts() {
@@ -257,9 +338,23 @@ class Posts {
 				user: true,
 				comments: true,
 				plugins: true,
+				upvotes: {
+					include: {
+						post: false,
+					},
+				},
+				downvotes: {
+					include: {
+						post: false,
+					},
+				},
+			},
+			orderBy: {
+				createdat: "desc",
 			},
 		});
-		return docs;
+
+		return docs.filter((p) => p.user.state != "BANNED");
 	}
 
 	static async updatePost(id: string, data: any) {
@@ -284,9 +379,20 @@ class Posts {
 				user: true,
 				comments: true,
 				plugins: true,
+				upvotes: {
+					include: {
+						post: false,
+					},
+				},
+				downvotes: {
+					include: {
+						post: false,
+					},
+				},
 			},
 		});
-		return docs;
+
+		return docs.filter((p) => p.user.state != "BANNED");
 	}
 
 	static async delete(PostID: string) {
@@ -298,6 +404,18 @@ class Posts {
 			});
 
 			await prisma.plugins.deleteMany({
+				where: {
+					postid: PostID,
+				},
+			});
+
+			await prisma.upvotes.deleteMany({
+				where: {
+					postid: PostID,
+				},
+			});
+
+			await prisma.downvotes.deleteMany({
 				where: {
 					postid: PostID,
 				},
@@ -317,13 +435,14 @@ class Posts {
 
 	static async upvote(PostID: string, UserID: string) {
 		try {
-			let post = await Posts.get(PostID);
-			post.upvotes.push(UserID);
-
-			const result = await Posts.updatePost(PostID, {
-				upvotes: post.upvotes,
+			await prisma.upvotes.create({
+				data: {
+					postid: PostID,
+					userid: UserID,
+				},
 			});
-			return result;
+
+			return true;
 		} catch (err) {
 			return err;
 		}
@@ -331,13 +450,14 @@ class Posts {
 
 	static async downvote(PostID: string, UserID: string) {
 		try {
-			let post = await Posts.get(PostID);
-			post.downvotes.push(UserID);
-
-			const result = await Posts.updatePost(PostID, {
-				downvotes: post.downvotes,
+			await prisma.downvotes.create({
+				data: {
+					postid: PostID,
+					userid: UserID,
+				},
 			});
-			return result;
+
+			return true;
 		} catch (err) {
 			return err;
 		}
